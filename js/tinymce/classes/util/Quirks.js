@@ -601,15 +601,15 @@ define("tinymce/util/Quirks", [
 
 			editor.on('cut', function(e) {
 				if (!isDefaultPrevented(e) && e.clipboardData && !editor.selection.isCollapsed()) {
-					e.preventDefault();
-					e.clipboardData.clearData();
-					e.clipboardData.setData('text/html', editor.selection.getContent());
-					e.clipboardData.setData('text/plain', editor.selection.getContent({format: 'text'}));
+					var html = editor.getBody().innerHTML;
+					var bm = editor.selection.getBookmark(2, true);
 
 					// Needed delay for https://code.google.com/p/chromium/issues/detail?id=363288#c3
 					// Nested delete/forwardDelete not allowed on execCommand("cut")
 					// This is ugly but not sure how to work around it otherwise
 					window.setTimeout(function() {
+						editor.getBody().innerHTML = html;
+						editor.selection.moveToBookmark(bm);
 						customDelete(true);
 					}, 0);
 				}
